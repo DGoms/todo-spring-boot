@@ -54,7 +54,7 @@ public class User implements UserDetails {
     private Instant updatedAt;
 
     @Getter
-    @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+    @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, fetch = FetchType.LAZY)
     private Set<TodoItem> todoItems;
 
 
