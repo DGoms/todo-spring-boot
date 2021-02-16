@@ -1,5 +1,6 @@
 package com.davidgomes.todospringboot.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Setter;
@@ -16,15 +17,20 @@ public class TodoItem {
     @GeneratedValue
     @Id
     private Integer id;
+
     @NotNull
     @Size(min = 3, max = 255)
     @Column(nullable = false)
     private String title;
+
     @Column(columnDefinition = "TEXT")
     private String description;
+
     @NotNull
     @Column(nullable = false)
     private TodoItemStatus status = TodoItemStatus.TODO;
+
+    @JsonIgnore
     @NotNull
     @ManyToOne(optional = false, cascade = CascadeType.REMOVE)
     private User user;
