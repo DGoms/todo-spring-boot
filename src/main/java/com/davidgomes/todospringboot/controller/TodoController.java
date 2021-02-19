@@ -5,15 +5,12 @@ import com.davidgomes.todospringboot.model.User;
 import com.davidgomes.todospringboot.repository.TodoRepository;
 import lombok.extern.apachecommons.CommonsLog;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.Set;
+import java.util.List;
 
-@RestController
 @RequestMapping(path = "/todo")
+@RestController
 @CommonsLog
 public class TodoController {
 
@@ -24,7 +21,11 @@ public class TodoController {
     }
 
     @GetMapping(path = "")
-    public Set<TodoItem> getAllTodoByCurrentUser(@AuthenticationPrincipal User user, @RequestParam String search) {
-        return todoRepository.findByUserAndTitleContaining(user, search);
+    public List<TodoItem> getAllTodoByCurrentUser(
+            @AuthenticationPrincipal User user,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) TodoItem.TodoItemStatus status
+    ) {
+        return todoRepository.findByUserWithOptions(user, search, status);
     }
 }

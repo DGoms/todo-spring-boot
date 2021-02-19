@@ -2,7 +2,6 @@ package com.davidgomes.todospringboot.config;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.davidgomes.todospringboot.service.UserDetailsServiceImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,13 +21,12 @@ import java.util.ArrayList;
 
 public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
+    // TODO: implement cache with memcached or redis ?
     private final UserCache userCache = new NullUserCache();
     private final UserDetailsService userDetailsService;
     private final AppProperties appProperties;
 
-//    private final UserDetailsServiceImpl userDetailsService;
-
-    public JWTAuthorizationFilter(AuthenticationManager authManager, AppProperties appProperties, UserDetailsServiceImpl userDetailsService) {
+    public JWTAuthorizationFilter(AuthenticationManager authManager, AppProperties appProperties, UserDetailsService userDetailsService) {
         super(authManager);
 
         this.appProperties = appProperties;
