@@ -1,6 +1,6 @@
 package com.davidgomes.todospringboot.config;
 
-import com.davidgomes.todospringboot.utils.StringToEnumConverterFactory;
+import com.davidgomes.todospringboot.utils.api_converter.StringToEnumConverterFactory;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;

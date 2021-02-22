@@ -1,4 +1,6 @@
-package com.davidgomes.todospringboot.utils;
+package com.davidgomes.todospringboot.utils.db_converter;
+
+import com.davidgomes.todospringboot.utils.PersistableEnum;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;

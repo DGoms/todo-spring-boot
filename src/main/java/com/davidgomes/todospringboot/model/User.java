@@ -53,6 +53,7 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private Instant updatedAt;
 
+    @ToString.Exclude
     @Getter
     @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, fetch = FetchType.LAZY)
     private Set<TodoItem> todoItems;
