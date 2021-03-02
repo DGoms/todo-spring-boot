@@ -37,20 +37,21 @@ public class TodoItem {
     private Instant createdAt;
 
     @JsonIgnore
-    @ManyToOne(optional = false, cascade = CascadeType.REMOVE)
+    @ManyToOne(optional = false)
     private User user;
+
     @Getter
     @Column(nullable = false, columnDefinition = "datetime default current_timestamp")
     private Instant updatedAt;
+
+    /*
+     * JPA lifecycle
+     */
 
     @PrePersist
     protected void prePersist() {
         createdAt = updatedAt = Instant.now();
     }
-
-    /*
-     * JPA lifecycle
-     */
 
     @PreUpdate
     protected void preUpdate() {

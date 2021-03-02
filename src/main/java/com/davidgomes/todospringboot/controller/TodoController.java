@@ -1,5 +1,6 @@
 package com.davidgomes.todospringboot.controller;
 
+import com.davidgomes.todospringboot.exception.EntityNotFoundException;
 import com.davidgomes.todospringboot.model.TodoItem;
 import com.davidgomes.todospringboot.model.User;
 import com.davidgomes.todospringboot.repository.TodoRepository;
@@ -31,9 +32,29 @@ public class TodoController extends BaseController {
     }
 
     @PostMapping(path = "")
-    public void addTodo(@AuthenticationPrincipal User user, @RequestBody @Valid TodoItem todoItem) {
+    public TodoItem addTodo(@AuthenticationPrincipal User user, @RequestBody @Valid TodoItem todoItem) {
         todoItem.setUser(user);
+        return todoRepository.save(todoItem);
+    }
 
-        todoRepository.save(todoItem);
+    @PutMapping(path = "/{id}")
+    public TodoItem editTodo(@PathVariable Integer id, @AuthenticationPrincipal User user, @RequestBody @Valid TodoItem todoChanges) {
+        return todoRepository.findByIdAndUser(id, user)
+                .map(todo -> {
+                    todo.setTitle(todoChanges.getTitle());
+                    todo.setDescription(todoChanges.getDescription());
+                    todo.setStatus(todoChanges.getStatus());
+
+                    return todoRepository.save(todo);
+                })
+                .orElseGet(() -> {
+                    throw new EntityNotFoundException(TodoItem.class, id);
+                });
+    }
+
+
+    @DeleteMapping("/{id}")
+    void deleteEmployee(@PathVariable Integer id, @AuthenticationPrincipal User user) {
+        todoRepository.deleteById(id);
     }
 }
