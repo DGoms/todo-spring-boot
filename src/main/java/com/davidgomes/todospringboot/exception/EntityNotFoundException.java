@@ -1,17 +1,19 @@
 package com.davidgomes.todospringboot.exception;
 
-public class EntityNotFoundException extends BaseException {
+import org.springframework.http.HttpStatus;
+
+public class EntityNotFoundException extends BaseHttpException {
 
     public EntityNotFoundException(String code, String message) {
-        super(code, message);
+        super(HttpStatus.NOT_FOUND, code, message);
     }
 
     public EntityNotFoundException(String message) {
-        super("entity_not_found", message);
+        this("entity_not_found", message);
     }
 
     @SuppressWarnings("rawtypes")
     public EntityNotFoundException(Class entityClass, Integer id) {
-        super("entity_not_found", entityClass.getSimpleName() + " not found with id: " + id);
+        this("entity_not_found", entityClass.getSimpleName() + " not found with id: " + id);
     }
 }
