@@ -3,8 +3,13 @@ package com.davidgomes.todospringboot.config;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserCache;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.cache.NullUserCache;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import javax.servlet.FilterChain;
@@ -16,12 +21,16 @@ import java.util.ArrayList;
 
 public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
+    // TODO: implement cache with memcached or redis ?
+    private final UserCache userCache = new NullUserCache();
+    private final UserDetailsService userDetailsService;
     private final AppProperties appProperties;
 
-    public JWTAuthorizationFilter(AuthenticationManager authManager, AppProperties appProperties) {
+    public JWTAuthorizationFilter(AuthenticationManager authManager, AppProperties appProperties, UserDetailsService userDetailsService) {
         super(authManager);
 
         this.appProperties = appProperties;
+        this.userDetailsService = userDetailsService;
     }
 
     @Override
@@ -45,16 +54,41 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
         String token = request.getHeader(appProperties.getJwt().getHeader());
         if (token != null) {
             // parse the token.
-            String user = JWT.require(Algorithm.HMAC512(appProperties.getJwt().getSecret().getBytes()))
+            String userEmail = JWT.require(Algorithm.HMAC512(appProperties.getJwt().getSecret().getBytes()))
                     .build()
                     .verify(token.replace(appProperties.getJwt().getTokenPrefix(), ""))
                     .getSubject();
 
-            if (user != null) {
-                return new UsernamePasswordAuthenticationToken(user, null, new ArrayList<>());
+            if (userEmail != null) {
+                UserDetails user = getUserByUsername(userEmail);
+
+                if (user != null) {
+                    return new UsernamePasswordAuthenticationToken(user, null, new ArrayList<>());
+                }
             }
             return null;
         }
+        return null;
+    }
+
+    private UserDetails getUserByUsername(String username) {
+        UserDetails user = this.userCache.getUserFromCache(username);
+
+        if (user == null) {
+            user = userDetailsService.loadUserByUsername(username);
+
+            if (user == null) {
+                throw new AuthenticationServiceException("AuthenticationDao returned null, which is an interface contract violation");
+            }
+
+            logger.info("User loaded by DB");
+            this.userCache.putUserInCache(user);
+
+            return user;
+        } else {
+            logger.info("User loaded by cache");
+        }
+
         return null;
     }
 }

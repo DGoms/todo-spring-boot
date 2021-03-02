@@ -12,6 +12,7 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.Collection;
+import java.util.Set;
 
 @ToString
 @Entity
@@ -52,12 +53,15 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private Instant updatedAt;
 
+    @ToString.Exclude
+    @Getter
+    @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, fetch = FetchType.LAZY)
+    private Set<TodoItem> todoItems;
 
 
     /*
      * Getters / Setters
      */
-
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -93,6 +97,18 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return this.enabled;
     }
+
+    public void addTodoItem(TodoItem todoItem) {
+        todoItems.add(todoItem);
+    }
+
+    public void removeTodoItem(TodoItem todoItem) {
+        todoItems.remove(todoItem);
+    }
+
+    /*
+     * JPA lifecycle
+     */
 
     @PrePersist
     protected void prePersist() {

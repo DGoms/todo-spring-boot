@@ -10,6 +10,7 @@ spring:
     initialization-mode: always
 
   jpa:
+    open-in-view: true
     hibernate:
       ddl-auto: update
     properties:
